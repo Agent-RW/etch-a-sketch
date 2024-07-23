@@ -1,11 +1,13 @@
-const SKETCH_PAD = document.querySelector("#sketch-pad");
+const SKETCH_GRID = document.querySelector("#sketch-grid");
 const RESET_BTN = document.querySelector("#reset-button");
+const TOGGLE_BTN = document.querySelector("#toggle-btn");
 let rows = 16;
 let cols = 16;
 let tileSize;
 
-function newGrid(rows, cols) {
-  tileSize = (1 / rows) * SKETCH_PAD.offsetHeight;
+function newGrid(rows, cols = rows) {
+  tileSize = (1 / rows) * SKETCH_GRID.offsetHeight;
+
   for (let row = 0; row < rows; row++) {
     let gridRow = document.createElement("div");
 
@@ -26,7 +28,7 @@ function newGrid(rows, cols) {
       gridRow.appendChild(gridTile);
     }
 
-    SKETCH_PAD.appendChild(gridRow);
+    SKETCH_GRID.appendChild(gridRow);
   }
 }
 
@@ -35,14 +37,22 @@ function setupControls() {
 }
 
 function onReset(event) {
-  while (SKETCH_PAD.firstChild) {
-    SKETCH_PAD.removeChild(SKETCH_PAD.firstChild);
+  while (SKETCH_GRID.firstChild) {
+    SKETCH_GRID.removeChild(SKETCH_GRID.firstChild);
   }
 
-  let newRows = prompt("How many rows?");
-  let newCols = prompt("How many columns?");
+  let gridSize = prompt("How large would you like your sketch-pad to be (px)?");
 
-  newGrid(newRows, newCols);
+  if(gridSize > 100) {
+    gridSize = 100;
+    alert("The grid size has been capped at 100 for performance purposes");
+  }
+
+  newGrid(gridSize)
+}
+
+function onToggle(event) {
+  
 }
 
 newGrid(rows, cols);
