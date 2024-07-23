@@ -1,12 +1,13 @@
 const SKETCH_GRID = document.querySelector("#sketch-grid");
 const RESET_BTN = document.querySelector("#reset-button");
-const TOGGLE_BTN = document.querySelector("#toggle-btn");
+const TOGGLE_BTN = document.querySelector("#toggle-button");
 let rows = 16;
 let cols = 16;
 let tileSize;
 
 function newGrid(rows, cols = rows) {
-  tileSize = (1 / rows) * SKETCH_GRID.offsetHeight;
+  // Subtracting 24 accounts for the internal padding of SKETCH_GRID
+  tileSize = (1 / rows) * (SKETCH_GRID.offsetHeight - 24);
 
   for (let row = 0; row < rows; row++) {
     let gridRow = document.createElement("div");
@@ -17,13 +18,14 @@ function newGrid(rows, cols = rows) {
     for (let col = 0; col < cols; col++) {
       let gridTile = document.createElement("div");
       gridTile.addEventListener("mouseenter", (e) => {
-        e.target.style.backgroundColor = "red";
+        e.target.style.opacity = "0.5";
       });
       gridTile.addEventListener("mouseleave", (e) => {
-        e.target.style.backgroundColor = "green";
+        e.target.style.opacity = "1.0";
+        e.target.style.backgroundColor = "black";
       });
 
-      gridTile.style.backgroundColor = "blue";
+      gridTile.style.backgroundColor = "white";
       gridTile.style.width = `${tileSize}px`;
       gridRow.appendChild(gridTile);
     }
@@ -32,11 +34,33 @@ function newGrid(rows, cols = rows) {
   }
 }
 
-function setupControls() {
-  RESET_BTN.addEventListener("click", onReset);
+function getGridTiles() {
+  let gridRows = SKETCH_GRID.childNodes;
+  let gridTiles = new Array();
+
+  for (let gridRow of gridRows) {
+    let rowTiles = gridRow.childNodes;
+    
+    for (let gridTile of rowTiles) {
+      gridTiles.push(gridTile);
+    }
+  }
+
+  console.log(gridTiles)
+  
+  return gridTiles;
 }
 
-function onReset(event) {
+function toggleMode() {
+  return 1;
+}
+
+function setupControls() {
+  RESET_BTN.addEventListener("click", onClickReset);
+  TOGGLE_BTN.addEventListener("click", onClickToggle);
+}
+
+function onClickReset(event) {
   while (SKETCH_GRID.firstChild) {
     SKETCH_GRID.removeChild(SKETCH_GRID.firstChild);
   }
@@ -51,8 +75,8 @@ function onReset(event) {
   newGrid(gridSize)
 }
 
-function onToggle(event) {
-  
+function onClickToggle(event) {
+  return getGridTiles();
 }
 
 newGrid(rows, cols);
