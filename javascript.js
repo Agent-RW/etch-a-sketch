@@ -1,8 +1,8 @@
 const SKETCH_GRID = document.querySelector("#sketch-grid");
 const RESET_BTN = document.querySelector("#reset-button");
 const TOGGLE_BTN = document.querySelector("#toggle-button");
-let rows = 16;
-let cols = 16;
+const DEFAULT_SIZE = 20;
+const MODES = ["black", "color", "layered"];
 let tileSize;
 
 function newGrid(rows, cols = rows) {
@@ -17,14 +17,6 @@ function newGrid(rows, cols = rows) {
 
     for (let col = 0; col < cols; col++) {
       let gridTile = document.createElement("div");
-      gridTile.addEventListener("mouseenter", (e) => {
-        e.target.style.opacity = "0.5";
-      });
-      gridTile.addEventListener("mouseleave", (e) => {
-        e.target.style.opacity = "1.0";
-        e.target.style.backgroundColor = "black";
-      });
-
       gridTile.style.backgroundColor = "white";
       gridTile.style.width = `${tileSize}px`;
       gridRow.appendChild(gridTile);
@@ -40,19 +32,40 @@ function getGridTiles() {
 
   for (let gridRow of gridRows) {
     let rowTiles = gridRow.childNodes;
-    
+
     for (let gridTile of rowTiles) {
       gridTiles.push(gridTile);
     }
   }
 
-  console.log(gridTiles)
-  
   return gridTiles;
 }
 
+function setMode(mode) {
+  let gridTiles = getGridTiles();
+  gridTiles.forEach((element) => {
+    element.removeEventListener("mouseenter", (e) => {
+      e.target.style.opacity = "0.5";
+    });
+    element.removeEventListener("mouseleave", (e) => {
+      e.target.style.opacity = "1.0";
+      e.target.style.backgroundColor = "black";
+    });
+  });
+
+  gridTiles.forEach((element) => {
+    element.addEventListener("mouseenter", (e) => {
+      e.target.style.opacity = "0.5";
+    });
+    element.addEventListener("mouseleave", (e) => {
+      e.target.style.opacity = "1.0";
+      e.target.style.backgroundColor = mode;
+    });
+  });
+}
+
 function toggleMode() {
-  return 1;
+  
 }
 
 function setupControls() {
@@ -67,17 +80,18 @@ function onClickReset(event) {
 
   let gridSize = prompt("How large would you like your sketch-pad to be (px)?");
 
-  if(gridSize > 100) {
+  if (gridSize > 100) {
     gridSize = 100;
     alert("The grid size has been capped at 100 for performance purposes");
   }
 
-  newGrid(gridSize)
+  newGrid(gridSize);
 }
 
 function onClickToggle(event) {
   return getGridTiles();
 }
 
-newGrid(rows, cols);
+newGrid(DEFAULT_SIZE);
+setMode("black");
 setupControls();
