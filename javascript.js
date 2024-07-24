@@ -1,9 +1,10 @@
 const SKETCH_GRID = document.querySelector("#sketch-grid");
 const RESET_BTN = document.querySelector("#reset-button");
 const TOGGLE_BTN = document.querySelector("#toggle-button");
-const MODES = ["black", "red", "layered"];
+const MODES = ["solid", "rainbow", "layering"];
 const DEFAULT_SIZE = 20;
 let currMode = 0;
+let currColor = 'red';
 let tileSize;
 
 function newGrid(rows, cols = rows) {
@@ -22,20 +23,46 @@ function newGrid(rows, cols = rows) {
       gridTile.style.width = `${tileSize}px`;
 
       gridTile.addEventListener("mouseenter", (e) => {
-        e.target.style.opacity = "0.5";
+        e.target.style.opacity = "0.1";
       });
       gridTile.addEventListener("mouseleave", (e) => {
         e.target.style.opacity = "1.0";
       });
-      gridTile.addEventListener("mouseleave", (e) => {
-        e.target.style.backgroundColor = MODES[currMode];
-      });
+      gridTile.addEventListener("mouseleave", handleSketching);
+      
 
       gridRow.appendChild(gridTile);
     }
 
     SKETCH_GRID.appendChild(gridRow);
   }
+}
+
+function handleSketching(event) {
+  let hue = "0";
+  let saturation = "100%";
+  let lightness = "50%";
+  let opacity = "100%";
+  let color;
+
+
+  switch (MODES[currMode]) {
+    case "solid":
+      hue = "180";
+      break;
+    case "rainbow":
+      hue = "" + (Math.random() * 360);
+      break;
+    case "layering":
+      hue = "180";
+      opacity = "50%"
+      break;
+    default:
+      color = "black";
+  }
+  color = `hsl(${hue} ${saturation} ${lightness} / ${opacity})`;
+
+  event.target.style.backgroundColor = color;
 }
 
 function getGridTiles() {
@@ -51,33 +78,6 @@ function getGridTiles() {
   }
 
   return gridTiles;
-}
-
-function setTileMode(gridTile, mode) {
-  gridTile.removeEventListener("mouseleave", (e) => {
-    e.target.style.backgroundColor = MODES[currMode];
-  });
-
-  gridTile.addEventListener("mouseleave", (e) => {
-    e.target.style.backgroundColor = MODES[mode];
-  });
-
-  currMode = mode;
-}
-
-function setGridMode(mode) {
-  let gridTiles = getGridTiles();
-  gridTiles.forEach((gridTile) => {
-    setTileMode(gridTile, mode);
-  });
-}
-
-function toggleGridMode() {
-  if (++currMode >= MODES.length) {
-    currMode = 0;
-  }
-
-  setGridMode(currMode);
 }
 
 function setupControls() {
@@ -101,7 +101,11 @@ function onClickReset(event) {
 }
 
 function onClickToggle(event) {
-  toggleGridMode()
+  if (++currMode >= MODES.length) {
+    currMode = 0;
+  }
+
+  return currMode;
 }
 
 newGrid(DEFAULT_SIZE);
