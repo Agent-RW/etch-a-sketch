@@ -1,8 +1,9 @@
 const SKETCH_GRID = document.querySelector("#sketch-grid");
 const RESET_BTN = document.querySelector("#reset-button");
 const TOGGLE_BTN = document.querySelector("#toggle-button");
+const MODES = ["black", "red", "layered"];
 const DEFAULT_SIZE = 20;
-const MODES = ["black", "color", "layered"];
+let currMode = 0;
 let tileSize;
 
 function newGrid(rows, cols = rows) {
@@ -19,6 +20,17 @@ function newGrid(rows, cols = rows) {
       let gridTile = document.createElement("div");
       gridTile.style.backgroundColor = "white";
       gridTile.style.width = `${tileSize}px`;
+
+      gridTile.addEventListener("mouseenter", (e) => {
+        e.target.style.opacity = "0.5";
+      });
+      gridTile.addEventListener("mouseleave", (e) => {
+        e.target.style.opacity = "1.0";
+      });
+      gridTile.addEventListener("mouseleave", (e) => {
+        e.target.style.backgroundColor = MODES[currMode];
+      });
+
       gridRow.appendChild(gridTile);
     }
 
@@ -41,31 +53,31 @@ function getGridTiles() {
   return gridTiles;
 }
 
-function setMode(mode) {
-  let gridTiles = getGridTiles();
-  gridTiles.forEach((element) => {
-    element.removeEventListener("mouseenter", (e) => {
-      e.target.style.opacity = "0.5";
-    });
-    element.removeEventListener("mouseleave", (e) => {
-      e.target.style.opacity = "1.0";
-      e.target.style.backgroundColor = "black";
-    });
+function setTileMode(gridTile, mode) {
+  gridTile.removeEventListener("mouseleave", (e) => {
+    e.target.style.backgroundColor = MODES[currMode];
   });
 
-  gridTiles.forEach((element) => {
-    element.addEventListener("mouseenter", (e) => {
-      e.target.style.opacity = "0.5";
-    });
-    element.addEventListener("mouseleave", (e) => {
-      e.target.style.opacity = "1.0";
-      e.target.style.backgroundColor = mode;
-    });
+  gridTile.addEventListener("mouseleave", (e) => {
+    e.target.style.backgroundColor = MODES[mode];
+  });
+
+  currMode = mode;
+}
+
+function setGridMode(mode) {
+  let gridTiles = getGridTiles();
+  gridTiles.forEach((gridTile) => {
+    setTileMode(gridTile, mode);
   });
 }
 
-function toggleMode() {
-  
+function toggleGridMode() {
+  if (++currMode >= MODES.length) {
+    currMode = 0;
+  }
+
+  setGridMode(currMode);
 }
 
 function setupControls() {
@@ -89,9 +101,8 @@ function onClickReset(event) {
 }
 
 function onClickToggle(event) {
-  return getGridTiles();
+  toggleGridMode()
 }
 
 newGrid(DEFAULT_SIZE);
-setMode("black");
 setupControls();
